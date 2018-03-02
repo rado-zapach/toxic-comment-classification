@@ -6,13 +6,17 @@ def readMyFile(filename):
 
         sum = 0
         chars = 0
+        words = 0
         for row in dataReader:
-            chars = chars + len(row[1])
             sum = sum + 1
+            chars = chars + len(row[1])
+            words = words + len(row[1].split())
 
         print(filename + " entries: " + str(sum))
         print(filename + " characters: " + str(chars))
-        print(filename + " average: " + str(chars/sum))
+        print(filename + " average characters: " + str(chars / sum))
+        print(filename + " words: " + str(words))
+        print(filename + " average words: " + str(words / sum))
 
 
 readMyFile('../data/train.csv')
