@@ -23,6 +23,9 @@ def check_links(text):
 def uppercase_normalize(text):
     return sum(1 for c in text if c.isupper()) / len(text)
 
+def normalize_polarity(number):
+    return (number + 1) / 2
+
 start = time.time()
 
 # load data from csv
@@ -50,6 +53,7 @@ df['upper_normalized'] = df.comment_text.apply(uppercase_normalize)
 
 # sentiment
 df[['polarity', 'subjectivity']] = df['comment_text'].apply(lambda Text: pd.Series(TextBlob(Text).sentiment))
+df['polarity'] = df.polarity.apply(normalize_polarity)
 print("sentiment done")
 
 # remove stop words
@@ -63,7 +67,6 @@ print("stop words done")
 nltk.download('wordnet')
 w_tokenizer = nltk.tokenize.WhitespaceTokenizer()
 lemmatizer = nltk.stem.WordNetLemmatizer()
-
 df['lemmatized'] = df.without_stopwords.apply(lemmatize_text)
 print("lemmatization done")
 
