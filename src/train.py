@@ -9,9 +9,55 @@ toxic = pd.DataFrame()
 nontoxic = pd.DataFrame()
 
 toxic =df.loc[df['toxic'] == 1]
+#xx = len(numpy.flatnonzero(toxic["has_link"].values == 1))
 nontoxic = df.loc[df['toxic'] == 0]
+#xz = len(numpy.flatnonzero(nontoxic["has_link"].values == 1))
+
 nontoxic = nontoxic.sample(n=16225)
+data_zavislosti = toxic.append(nontoxic)
+
+# Correction Matrix Plot
+import matplotlib.pyplot as plt
+from pandas.plotting import scatter_matrix
+url = "https://raw.githubusercontent.com/jbrownlee/Datasets/master/pima-indians-diabetes.data.csv"
+correlations = data_zavislosti[["polarity","subjectivity","has_link","upper_normalized","words_normalized"]].corr()
+scatter_matrix(data_zavislosti[["polarity","subjectivity","has_link","upper_normalized","words_normalized"]])
+plt.show()
+print(correlations)
+names = ['polarity', 'subjectivity', 'has_link', 'upper_normalized','words_normalized']
+# plot correlation matrix
+fig = plt.figure()
+ax = fig.add_subplot(111)
+cax = ax.matshow(correlations, vmin=-1, vmax=1)
+fig.colorbar(cax)
+ticks = numpy.arange(0,5,1)
+ax.set_xticks(ticks)
+ax.set_yticks(ticks)
+ax.set_xticklabels(names)
+ax.set_yticklabels(names)
+plt.show()
+
+
+
+
+from scipy.stats import chisquare
+from sklearn.feature_selection import SelectKBest
+from sklearn.feature_selection import chi2
+
+data_zavislosti = toxic.append(nontoxic)
+ch2, p = chisquare(data_zavislosti["has_link"])
+print(ch2,p)
+ch2, p = chisquare(data_zavislosti["polarity"])
+print(ch2,p)
+ch2, p = chisquare(data_zavislosti["subjectivity"])
+print(ch2,p)
+ch2, p = chisquare(data_zavislosti["upper_normalized"])
+print(ch2,p)
+ch2, p = chisquare(data_zavislosti["words_normalized"])
+print(ch2,p)
 #chi square,  pozor na pocet datv triedahc aby neboli rozdielne,vizualizovat feature,  ci je relevantna na zaklade
+chi2_selector = SelectKBest(chi2, k=2)
+X_kbest = chi2_selector.fit_transform(data_zavislosti[["subjectivity","has_link","upper_normalized","words_normalized"]].values, data_zavislosti["toxic"].values)
 
 X_train_t, X_test_t, y_train_t, y_test_t = train_test_split(toxic[["polarity","subjectivity","has_link","upper_normalized","words_normalized"]], toxic["toxic"], test_size=0.2)
 X_train_n, X_test_n, y_train_n, y_test_n = train_test_split(nontoxic[["polarity","subjectivity","has_link","upper_normalized","words_normalized"]], nontoxic["toxic"], test_size=0.2)
