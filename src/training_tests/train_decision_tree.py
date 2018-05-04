@@ -8,9 +8,9 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, classification_report, confusion_matrix
 
-df = pd.read_csv("../data/ngrams_test.csv")
+df = pd.read_csv("../../data/transformed2.csv")
 
-vectoriser = TfidfVectorizer()
+vectoriser = TfidfVectorizer(min_df=0.2)
 df['tfidf'] = list(vectoriser.fit_transform(df['lemmatized'].values.astype('U')).toarray())
 
 # print(df.tfidf)
@@ -19,6 +19,11 @@ df['tfidf'] = list(vectoriser.fit_transform(df['lemmatized'].values.astype('U'))
 # df['ngrams'] = list(ngram_vectorizer.fit_transform(df['lemmatized'].values.astype('U')).toarray())
 
 # print(df.ngrams)
+
+toxic = df.loc[df['toxic'] == 1]
+nontoxic = df.loc[df['toxic'] == 0]
+nontoxic = nontoxic.sample(n=len(toxic.index))
+df = pd.concat([toxic, nontoxic])
 
 X_train, X_test, y_train, y_test = train_test_split(df['tfidf'].tolist(), df["toxic"].tolist(), test_size=0.2)
 
