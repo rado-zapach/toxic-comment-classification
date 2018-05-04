@@ -3,6 +3,7 @@ import pandas as pd
 from sklearn.feature_extraction import text
 from textblob import TextBlob
 import time
+import re
 
 def lemmatize_text(text):
     return " ".join([lemmatizer.lemmatize(w) for w in w_tokenizer.tokenize(text)])
@@ -21,6 +22,9 @@ def check_links(text):
 
 def uppercase_normalize(text):
     return sum(1 for c in text if c.isupper()) / len(text)
+
+def normalize_polarity(number):
+    return (number + 1) / 2
 
 start = time.time()
 
@@ -44,11 +48,12 @@ max_words = df['words'].max()
 df['words_normalized'] = df['words'] / max_words
 del df['words']
 
-# normalize upper case count
+# normalized upper case count
 df['upper_normalized'] = df.comment_text.apply(uppercase_normalize)
 
 # sentiment
 df[['polarity', 'subjectivity']] = df['comment_text'].apply(lambda Text: pd.Series(TextBlob(Text).sentiment))
+df['polarity'] = df.polarity.apply(normalize_polarity)
 print("sentiment done")
 
 # remove stop words
@@ -62,12 +67,13 @@ print("stop words done")
 nltk.download('wordnet')
 w_tokenizer = nltk.tokenize.WhitespaceTokenizer()
 lemmatizer = nltk.stem.WordNetLemmatizer()
-
 df['lemmatized'] = df.without_stopwords.apply(lemmatize_text)
 print("lemmatization done")
 
 # check if comment has any link
 df['has_link'] = df.comment_text.apply(check_links)
+
+df.to_csv('../data/transformed.csv')
 
 end = time.time()
 print(end - start)
