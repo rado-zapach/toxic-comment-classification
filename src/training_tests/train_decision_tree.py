@@ -23,9 +23,23 @@ df['tfidf'] = list(vectoriser.fit_transform(df['lemmatized'].values.astype('U'))
 toxic = df.loc[df['toxic'] == 1]
 nontoxic = df.loc[df['toxic'] == 0]
 nontoxic = nontoxic.sample(n=len(toxic.index))
-df = pd.concat([toxic, nontoxic])
+#df = pd.concat([toxic, nontoxic])
 
-X_train, X_test, y_train, y_test = train_test_split(df['tfidf'].tolist(), df["toxic"].tolist(), test_size=0.2)
+
+X_train_t, X_test_t, y_train_t, y_test_t = train_test_split(toxic['tfidf'], toxic["toxic"], test_size=0.2)
+X_train_n, X_test_n, y_train_n, y_test_n = train_test_split(nontoxic['tfidf'], nontoxic["toxic"], test_size=0.2)
+X_train = X_train_t.append(X_train_n)
+X_test = X_test_t.append(X_test_n)
+y_train = y_train_t.append(y_train_n)
+y_test = y_test_t.append(y_test_n)
+
+print(X_train.shape, y_train.shape)
+print(X_test.shape, y_test.shape)
+
+X_train = X_train.tolist()
+X_test = X_test.tolist()
+y_train = y_train.tolist()
+y_test = y_test.tolist()
 
 clf = svm.SVC(C=1.0, cache_size=200, class_weight=None, coef0=0.0,
     decision_function_shape='ovr', degree=3, gamma='auto', kernel='rbf',
@@ -45,7 +59,7 @@ y_pred = clf.predict(X_test)
 
 # print(df.tfidf)
 
-print(f1_score(y_test, y_pred, average="macro"))
+print(f1_score(y_test, y_pred))
 print(precision_score(y_test, y_pred, average="macro"))
 print(recall_score(y_test, y_pred, average="macro"))
 print(accuracy_score(y_test, y_pred))
