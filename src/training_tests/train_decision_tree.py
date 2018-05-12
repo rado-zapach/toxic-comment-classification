@@ -41,10 +41,7 @@ X_test = X_test.tolist()
 y_train = y_train.tolist()
 y_test = y_test.tolist()
 
-clf = svm.SVC(C=1.0, cache_size=200, class_weight=None, coef0=0.0,
-    decision_function_shape='ovr', degree=3, gamma='auto', kernel='rbf',
-    max_iter=-1, probability=False, random_state=None, shrinking=True,
-    tol=0.001, verbose=False).fit(X_train, y_train)
+clf = svm.SVC(C=1.0, cache_size=200, gamma='auto', kernel='rbf').fit(X_train, y_train)
 
 y_pred = clf.predict(X_test)
 
@@ -60,6 +57,6 @@ y_pred = clf.predict(X_test)
 # print(df.tfidf)
 
 print(f1_score(y_test, y_pred))
-print(precision_score(y_test, y_pred, average="macro"))
-print(recall_score(y_test, y_pred, average="macro"))
+print(precision_score(y_test, y_pred))
+print(recall_score(y_test, y_pred))
 print(accuracy_score(y_test, y_pred))
